@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedRush</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    <style>th, td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 15px;
+        padding-right: 20px;
+      }</style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body style="font-family: 'Raleway', sans-serif;">
+    <div class="container" style="padding-top: 30px;">
+    <h4><b><span id="header" style="padding-left: 60px;"></span></b></h4>
+    <div style="padding-left: 40px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <hr>
+            </div>
+        </div>
+    </div>
+    <table>
+        <tr>
+            <td><b>ID Number:</b></td>
+            <td id="id_no"></td>
+        </tr>
+        <tr>
+            <td><b>Name:</b></td>
+            <td id="name"></td>
+        </tr>
+        <tr>
+            <td><b>Designation:</b></td>
+            <td id="type"></td>
+        </tr>
+        <tr>
+            <td><b>Email:</b></td>
+            <td id="email"></td>
+        </tr>
+        <tr>
+            <td><b>Contact Number:</b></td>
+            <td id="contact"></td>
+        </tr>
+        <tr>
+            <td><b>Salary:</b></td>
+            <td id="salary"></td>
+        </tr>
+        <tr>
+            <td><b>Blood Group:</b></td>
+            <td id="bloodgroup"></td>
+        </tr>
+        <tr>
+            <td><b>Department:</b></td>
+            <td id="department"></td>
+        </tr>
+    </table>
+    </div>
+    </div>
+    <script>
+       var parameter = new URLSearchParams(window.location.search);
+       var uid = parameter.get("uid");
+       if (uid==null){
+           window.alert("Invalid user! Please try again.");
+              window.location.href = "index.html";
+       }
+    </script>
+    <script src="assets/js/index.js" async></script>
+    <script type="module" async>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getStorage, ref } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+        const firebaseConfig = callFirebase()
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore();
+        const storage = getStorage();
+        const storageRef = ref(storage);
+        
+        var user;
+        import { collection, addDoc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        try{
+            var docSnap = await getDoc(doc(db,"Users", uid).withConverter(firestoreConverter));
+            if(docSnap.exists()){
+                user = new User(uid,docSnap.data().name, docSnap.data().id_no, docSnap.data().type, docSnap.data().password, docSnap.data().salary, docSnap.data().bloodgroup, docSnap.data().email, docSnap.data().contact, docSnap.data().department);
+            } else {
+                window.alert("User not found! Contact administrator");
+                window.location.href="index.html";
+            }
+           }catch(e){
+            window.alert("Error Occured! Please wait for a while or Contact administrator!");
+            console.log(e);
+            }
+        document.getElementById("header").innerHTML = user.name.split(' ')[0]+"'s Profile";
+        document.getElementById("name").innerHTML = user.name;
+        document.getElementById("id_no").innerHTML = user.id_no;
+        document.getElementById("type").innerHTML = user.type;
+        document.getElementById("salary").innerHTML =user.salary;
+        document.getElementById("bloodgroup").innerHTML =user.bloodgroup;
+        document.getElementById("email").innerHTML = user.email;
+        document.getElementById("contact").innerHTML =user.contact;
+        document.getElementById("department").innerHTML =user.department;
+    </script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedRush</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    <style>th, td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 15px;
+        padding-right: 20px;
+      }</style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body style="font-family: 'Raleway', sans-serif;">
+    <div class="container" style="padding-top: 30px;">
+    <div class="row"><div class="col-sm-5"><b><span id="header" style="padding-left: 60px; font-size: 30px;"></span></b></div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-6"><button type="button" class="btn btn-primary" id="doctorControls0" style="font-size: 20px;">Add to prescription</button>
+    <button type="button" class="btn btn-primary" id="doctorControls1" style="font-size: 20px;">Add to diagnosis</button>
+    <button type="button" class="btn btn-primary" id="doctorControls2" style="font-size: 20px;">Add/Edit comments</button>
+    </div></div>
+    <div style="padding-left: 40px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <hr>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-7">
+    <table>
+        <tr>
+            <td><b>ID Number:</b></td>
+            <td id="userId"></td>
+        </tr>
+        <tr>
+            <td><b>Name:</b></td>
+            <td id="name"></td>
+        </tr>
+        <tr id="show0" style="font-weight:bold;">
+            <td>SpO<sub>2</sub> Level:</td>
+            <td id="spo2"></td>
+        </tr>
+        <tr id="show1" style="font-weight:bold;">
+            <td>Heartbeat:</td>
+            <td id="heartbeat"></td>
+        </tr>
+        <tr>
+            <td><b>Date of birth:</b></td>
+            <td id="dob"></td>
+        </tr>
+        <tr>
+            <td><b>Gender:</b></td>
+            <td id="gender"></td>
+        </tr>
+        <tr>
+            <td><b>Blood Group:</b></td>
+            <td id="bloodgroup"></td>
+        </tr>
+        <tr>
+            <td><b>Admission Date:</b></td>
+            <td id="admissionDate"></td>
+        </tr>
+        <tr>
+            <td><b>Nurse:</b></td>
+            <td id="assignedNurseId"></td>
+        </tr>
+        <tr>
+            <td><b>Housekeeping:</b></td>
+            <td id="assignedHousekeepingId"></td>
+        </tr>
+        <tr>
+            <td><b>Room Number:</b></td>
+            <td id="roomNumber"></td>
+        </tr>
+         <tr>
+            <td><b>Discharge Date:</b></td>
+            <td id="dischargeDate"></td>
+        </tr> 
+        <tr>
+            <td><b> Latest Diagnosis:</b></td>
+            <td id="diagnosis"></td>
+        </tr>
+        <tr>
+            <td><b>Prescription:</b></td>
+            <td id="prescription"></td>
+        </tr>
+        <tr>
+            <td><b>Emergency Contac:</b></td>
+            <td id="emergencyContactName"></td>
+        </tr>
+        <tr>
+            <td><b>Emergency Number:</b></td>
+            <td id="emergencyContactNumber"></td>
+        </tr>
+        <tr>
+            <td><b>Doctor Comments:</b></td>
+            <td id="doctorComments"></td>
+        </tr>
+    </table>
+            </div>
+            <div class="col-sm-1"></div>
+            <div class="col-sm-4">
+                <div id="patientData"> 
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+       var parameter = new URLSearchParams(window.location.search);
+       var uid = parameter.get("uid");
+       if (uid==null){
+           window.alert("Invalid user! Please try again.");
+              window.location.href = "index.html";
+       }
+    </script>
+    <script src="assets/js/index.js" async></script>
+    <script type="module" async>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        const firebaseConfig = callFirebase()
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore();
+        var userId=localStorage.getItem("userId");
+        var userType=localStorage.getItem("userType");
+        var user;
+        import { collection, addDoc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        try{
+            var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+            if(data.exists()){
+                user = data.data();
+            } else {
+                window.alert("User not found! Contact administrator");
+                window.location.href="index.html";
+            }
+           }catch(e){
+            window.alert("Error Occured! Please wait for a while or Contact administrator!");
+            console.log(e);
+            }
+        document.getElementById("header").innerHTML =  user.name.split(' ')[0]+"'s Profile";
+        document.getElementById("userId").innerHTML =user.userid;
+        document.getElementById("name").innerHTML = user.name;
+        document.getElementById("dob").innerHTML = user.dob.split('-')[2]+"/"+user.dob.split('-')[1]+"/"+user.dob.split('-')[0];
+        document.getElementById("gender").innerHTML = user.gender;
+        document.getElementById("bloodgroup").innerHTML =user.bloodgroup;
+        document.getElementById("admissionDate").innerHTML = user.admissionDate;
+        document.getElementById("assignedNurseId").innerHTML ='<a href="userprofile.html?uid='+user.assignedNurseId+'" style="text-decoration:none;">'+user.assignedNurseId+'</a>';
+        document.getElementById("assignedHousekeepingId").innerHTML ='<a href="userprofile.html?uid='+user.assignedHousekeepingId+'" style="text-decoration:none;">'+user.assignedHousekeepingId+'</a>';
+        const diagnosisArray = [...user.diagnosis];
+        document.getElementById("diagnosis").innerHTML = diagnosisArray.join('<br>');
+        const prescriptionArray = [...user.prescription];
+        document.getElementById("prescription").innerHTML = prescriptionArray.join('<br>');
+        document.getElementById("dischargeDate").innerHTML = user.dischargeDate;
+        document.getElementById("roomNumber").innerHTML = user.roomNumber;
+        document.getElementById("emergencyContactName").innerHTML = user.emergencyContactName;
+        document.getElementById("emergencyContactNumber").innerHTML = user.emergencyContactNumber;
+        document.getElementById("doctorComments").innerHTML = user.doctorComments;
+    if(userType!="Doctor"){
+        document.getElementById("doctorControls0").style.display="none";
+        document.getElementById("doctorControls1").style.display="none";
+        document.getElementById("doctorControls2").style.display="none";
+    } else{
+        document.getElementById("doctorControls0").style.display="";
+        document.getElementById("doctorControls1").style.display="";
+        document.getElementById("doctorControls2").style.display="";
+    }
+    if(userType=="Doctor"||userType=="Nurse"){
+        document.getElementById("patientData").style.display="";
+    } else{
+        document.getElementById("patientData").style.display="none";
+    }
+
+    document.getElementById("doctorControls1").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var newDiagnosis = prompt("Enter new diagnosis");
+        if(newDiagnosis!=null){
+            var newDiagnosisArray = [...user.diagnosis];
+            newDiagnosisArray.push(newDiagnosis);
+            var newDiag = {
+                diagnosis: newDiagnosisArray
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDiag);
+            var notif = await getDoc(doc(db,"notifications", uid).withConverter(notificationConverter));
+            if (!notif.exists()){
+                await setDoc(doc(db,"notifications", uid), {
+                    notification: []
+                });
+            }
+            var notif = await getDoc(doc(db,"notifications", uid).withConverter(notificationConverter));
+            var notifArray = [...notif.data().notification];
+            notifArray.push("New diagnosis has been added by your doctor!");
+            await updateDoc(doc(db,"notifications", uid), {
+                notification: notifArray
+            });
+            window.location.reload();
+        }
+    });
+
+    document.getElementById("doctorControls0").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var newPrescription = prompt("Enter new prescription");
+        if(newPrescription!=null){
+            var newPrescriptionArray = [...user.prescription];
+            newPrescriptionArray.push(newPrescription);
+            var newPres = {
+                prescription: newPrescriptionArray
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newPres);
+            var notif = await getDoc(doc(db,"notifications", uid).withConverter(notificationConverter));
+            if (!notif.exists()){
+                await setDoc(doc(db,"notifications", uid), {
+                    notification: []
+                });
+            }
+            var notif = await getDoc(doc(db,"notifications", uid).withConverter(notificationConverter));
+            var notifArray = [...notif.data().notification];
+            notifArray.push("New medicine has been added by your doctor!");
+            await updateDoc(doc(db,"notifications", uid), {
+                notification: notifArray
+            });
+            window.location.reload();
+        }
+    });
+
+    document.getElementById("doctorControls2").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var newDoctorComments = prompt("Enter new doctor comments");
+        if(newDoctorComments!=null){
+            var newDocCom = {
+                doctorComments: newDoctorComments
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            var notif = await getDoc(doc(db,"notifications", uid).withConverter(notificationConverter));
+            if (!notif.exists()){
+                await setDoc(doc(db,"notifications", uid), {
+                    notification: []
+                });
+            }
+            var notif = await getDoc(doc(db,"notifications", uid).withConverter(notificationConverter));
+            var notifArray = [...notif.data().notification];
+            notifArray.push("New comment has been added by the doctor!");
+            await updateDoc(doc(db,"notifications", uid), {
+                notification: notifArray
+            });
+            window.location.reload();
+        }
+    });
+    </script>
+    <script type="module" async>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.1/firebase-app.js";
+    import { getDatabase, ref, get, set, child, update, remove, onValue } from "https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js";
+    import { getFirestore, collection, addDoc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    var userId=localStorage.getItem("userId");
+    var userType=localStorage.getItem("userType");
+    const app1 = initializeApp(callFirebase());
+        const db0 = getFirestore();
+        const db1 = getDatabase();
+    var parameter = new URLSearchParams(window.location.search);
+    var pid = parameter.get("uid");
+    if (pid==null){
+        window.alert("Invalid user! Please try again.");
+        window.location.href = "index.html";
+       }
+    async function notify(uid, newNotif)
+    {
+        var notif = await getDoc(doc(db0,"notifications", uid).withConverter(notificationConverter));
+            if (!notif.exists()){
+                await setDoc(doc(db0,"notifications", uid), {
+                    notification: []
+                });
+            }
+            var notif = await getDoc(doc(db0,"notifications", uid).withConverter(notificationConverter));
+            var notifArray = [...notif.data().notification];
+            notifArray.push(newNotif);
+            await updateDoc(doc(db0,"notifications", uid), {
+                notification: notifArray
+            });
+        }
+    if (pid=="rahulgoel" && (userType=='Doctor'||userType=='Nurse')){
+        document.getElementById("show0").style.display="";
+        document.getElementById("show1").style.display="";
+        
+        const distanceRef = ref(db1, );
+        onValue(distanceRef, (snapshot) => {
+        const heartbeat = snapshot.val().HeartBeat;
+        const spo2 = snapshot.val().SpO2;
+        updateTheValue(heartbeat, spo2);
+        });
+    } else {
+        document.getElementById("show0").style.display="none";
+        document.getElementById("show1").style.display="none";
+    }
+
+    async function updateTheValue(heartbeat, spo2){
+        document.getElementById("heartbeat").innerHTML = heartbeat;
+        document.getElementById("spo2").innerHTML = spo2;
+        if (heartbeat>=95){
+            document.getElementById("heartbeat").style.color = "red";
+            /////////////////////////////////////////////////
+            notify(pid, "<span style = 'color:red;'>[ "+Date().toString()+" ]: Your heart beat is high! Please consult your doctor immediately!</span>");
+            notify(userId, "<span style = 'color:red;'>[ "+Date().toString()+" ]: Patient "+pid+" has a high heart beat! Please consult them immediately!</span>");
+            /////////////////////////////////////////////////
+        } else if (heartbeat>=80 && heartbeat<95){
+            document.getElementById("heartbeat").style.color = "orange";
+        } else if(heartbeat<=40 && heartbeat>20){
+            document.getElementById("heartbeat").style.color = "orange";
+        } else if(heartbeat<=20){
+            document.getElementById("heartbeat").style.color = "red";
+            /////////////////////////////////////////////////
+            notify(pid, "<span style = 'color:red;'>[ "+Date().toString()+" ]: Your heart beat is low! Please consult your doctor immediately!</span>");
+            notify(userId, "<span style = 'color:red;'>[ "+Date().toString()+" ]: Patient "+pid+" has a low heart beat! Please consult them immediately!</span>");
+            /////////////////////////////////////////////////
+        } else {
+            document.getElementById("heartbeat").style.color = "green";
+        }
+
+        if (spo2>=90){
+            document.getElementById("spo2").style.color = "green";
+        } else if (spo2>=80 && spo2<90){
+            document.getElementById("spo2").style.color = "orange";
+        } else {
+            document.getElementById("spo2").style.color = "red";
+            /////////////////////////////////////////////////
+            notify(pid, "<span style = 'color:red;'>[ "+Date().toString()+" ]: Your oxygen level is low! Please consult your doctor immediately!</span>");
+            notify(userId, "<span style = 'color:red;'>[ "+Date().toString()+" ]: Patient "+pid+" has a low oxygen level! Please consult them immediately!</span>");
+            /////////////////////////////////////////////////
+        }
+    }
+    </script>
+</body>
+</html>

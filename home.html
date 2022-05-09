@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedRush</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="assets/css/index.css">
+</head>
+<body style="font-family: 'Raleway', sans-serif; background-color:white">
+  <div style="background-color: #1FD5E0; padding: 20px;"><p>
+    <button style="text-decoration: none; border:none; background-color:#1FD5E0;" id="log-out"><span class="glyphicon glyphicon-log-out"></span></button>&nbsp;
+    <span id="nameprint" style="font-size: 24px;"></span>
+    <span style="color: rgb(75, 75, 75);" id="designation" style="font-size:17px;"></span></p>
+  </div>
+  <section>
+    <div class="container" style="padding-top: 30px;">
+    <div id="loginNotification" style="font-size:17px;"></div><br>
+    <div id="a"></div>
+    <div style="padding-top: 53px"></div>
+    <div class="row">
+      &emsp;&emsp; &emsp;&emsp;
+      <div class="col-sm-3 border rounded-lg" style="background-color:#4BDEE7; text-align:center; margin:30px;">
+        <a id="col1ref" style="text-decoration: none;"><h3 style="padding: 7%; color: black;" id="col1"></h3></a>
+      </div>
+      <div class="col-sm-3 border rounded-lg" style="background-color:#4BDEE7; text-align:center; margin:30px;">
+        <a id="col2ref" style="text-decoration: none;"><h3 style="padding: 7%; color: black;" id="col2"></h3></a>
+      </div>
+      <div class="col-sm-3 border rounded-lg" style="background-color:#4BDEE7; text-align:center; margin:30px;">
+        <a id="col3ref" style="text-decoration: none;"><h3 style="padding: 7%; color: black;" id="col3"></h3></a>
+      </div>
+      </div>
+      <h3 style="padding-left: 7px; padding-top: 30px;">Latest Notifications</h3>
+      <hr>
+      <div id="notification" style="font-size:15px; padding-left: 20px;">
+      </div>
+    </div>
+    <!-- <p id="temperature"></p>
+    <p id="humidity"></p>
+    <p id="gas-level"></p> -->
+  </section>
+<script src="assets/js/index.js" async></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script type="module" async>
+  var user,login;
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+  import { collection, addDoc, setDoc, getDoc, getDocs, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+  const firebaseConfig = callFirebase()
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore();
+  const userId=localStorage.getItem("userId");
+    try{
+    var docSnap = await getDoc(doc(db,"Users", userId).withConverter(firestoreConverter));
+    var loginSnap = await getDoc(doc(db,"UserLoginTimestamp", userId).withConverter(loginConverter));
+  if(docSnap.exists()){
+    user = new User(userId, docSnap.data().name, docSnap.data().id_no, docSnap.data().type, docSnap.data().password, docSnap.data().salary, docSnap.data().bloodgroup, docSnap.data().email, docSnap.data().contact, docSnap.data().department);
+    login = new Login(loginSnap.data().lastLoginTimestamp, loginSnap.data().loggedIn);
+  } else {
+    if(window.confirm("User not found! Contact administrator!")){
+      window.location.href = "index.html";
+    } else {
+      window.location.href = "index.html";
+    }
+   }
+  }catch(error){
+    console.log("Caught Error: ",error);
+    window.alert("You are signed out! Please sign in again!");
+    window.location.href = "index.html";
+  }
+
+document.getElementById("nameprint").innerHTML=user.name.toUpperCase();
+document.getElementById("designation").innerHTML=user.type;
+if(user.type=="Doctor"){
+  document.getElementById("a").innerHTML="<a href='changeshift.html' style='text-decoration: none; font-size: 17px; padding-left: 10px;''>Change work shift</a>";
+  document.getElementById("col1").innerHTML="Patients";
+  document.getElementById("col1ref").href="doctorpatients.html";
+  document.getElementById("col2").innerHTML="Appointments";
+  document.getElementById("col2ref").href="doctorappointments.html";
+  document.getElementById("col3").innerHTML="Profile";
+  document.getElementById("col3ref").href="userprofile.html?uid="+userId;
+} else if(user.type=="Nurse"){
+  document.getElementById("a").innerHTML="<a href='changeshift.html' style='text-decoration: none; font-size: 17px; padding-left: 10px;''>Change work shift</a>";
+  document.getElementById("col1").innerHTML="Patients";
+  document.getElementById("col1ref").href="nursepatients.html";
+  document.getElementById("col2").innerHTML="Rooms Allotted";
+  document.getElementById("col2ref").href="nurseroomsallotted.html";
+  document.getElementById("col3").innerHTML="Profile";
+  document.getElementById("col3ref").href="userprofile.html?uid="+userId;
+} else if(user.type=="Receptionist"){
+  document.getElementById("a").innerHTML="<a href='changeshift.html' style='text-decoration: none; font-size: 17px; padding-left: 10px;''>Change work shift</a>";
+  document.getElementById("col1").innerHTML="New Patient";
+  document.getElementById("col1ref").href="newpatient.html";
+  document.getElementById("col2").innerHTML="Manage Patients";
+  document.getElementById("col2ref").href="managepatients.html";
+  document.getElementById("col3").innerHTML="Profile";
+  document.getElementById("col3ref").href="userprofile.html?uid="+userId;
+} else if(user.type=="Pharmacist"){
+  document.getElementById("a").innerHTML="<a href='changeshift.html' style='text-decoration: none; font-size: 17px; padding-left: 10px;''>Change work shift</a>";
+  document.getElementById("col1").innerHTML="Inventory";
+  document.getElementById("col1ref").href="inventory.html";
+  document.getElementById("col2").innerHTML="Orders";
+  document.getElementById("col2ref").href="orders.html";
+  document.getElementById("col3").innerHTML="Profile";
+  document.getElementById("col3ref").href="userprofile.html?uid="+userId;
+} else if(user.type=="Housekeeping"){
+  document.getElementById("a").style.display="none";
+  document.getElementById("col1").innerHTML="Rooms Allotted";
+  document.getElementById("col1ref").href="roomsallotted.html";
+  document.getElementById("col2").innerHTML="Change Shift";
+  document.getElementById("col2ref").href="changeshift.html";
+  document.getElementById("col3").innerHTML="Profile";
+  document.getElementById("col3ref").href="userprofile.html?uid="+userId;
+} else if(user.type=="Administrator"){
+  document.getElementById("a").style.display="none";
+  document.getElementById("col1").innerHTML="Manage Staff";
+  document.getElementById("col1ref").href="managestaff.html";
+  document.getElementById("col2").innerHTML="Control Panel";
+  document.getElementById("col2ref").target="_blank";
+  document.getElementById("col2ref").href="managehospital.html";
+  document.getElementById("col3").innerHTML="Staff Attendance";
+  document.getElementById("col3ref").href="attendance.html";
+}
+document.getElementById("log-out").addEventListener("click", logout);
+async function logout(){
+  if(window.confirm("Are you sure you want to log out?")){
+  try{
+    var docSnap = await getDoc(doc(db,"Users", userId).withConverter(firestoreConverter));
+    var loginSnap = await getDoc(doc(db,"UserLoginTimestamp", userId).withConverter(loginConverter));
+  if(docSnap.exists() && loginSnap.exists()){
+    var logoutSnap = await getDoc(doc(db,"UserLoginTimestamp", userId).withConverter(loginConverter));
+    if(logoutSnap.data().loggedIn == true){
+      await updateDoc(doc(db,"UserLoginTimestamp", userId).withConverter(loginConverter), {loggedIn: false});
+      window.location.href = "index.html";
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userType");
+    } else {
+      window.alert("You are already logged out!");
+    }
+  } else {
+    console.log("Caught Error: ",e);
+    window.alert("Error! Please retry!");
+    window.location.reload;
+  }
+} catch(e){
+  console.log("Caught Error: ",e);
+  window.alert("Database Error! Please retry again!");
+  window.location.reload;
+  }
+ } else {
+  return;
+ }
+}
+var loginNotification = "Welcome, "+user.name.split(' ')[0]+"!"+"\n"+"You have last been logged in on "+login.lastLoginTimestamp+'.';
+document.getElementById("loginNotification").innerHTML=loginNotification;
+
+        // async function notification(){
+        //   var notifArray = [];
+        //   const unsub = onSnapshot(
+        //   doc(db, "notifications", userId), (doc) => {
+        //   const docSnapshot = await getDoc(doc(db,"notifications", userId).withConverter(notificationConverter));
+        //   if (docSnapshot.exists()){
+        //     var notification = new Notification(docSnapshot.data().notification);
+        //     notifArray = [...notification.notification].reverse();
+        //     if(notifArray.length!=0) {
+        //       document.getElementById("notification").innerHTML=notifArray.join('<br><br>');
+        //     } else {
+        //       document.getElementById("notification").innerHTML="No new notifications!";
+        //     }
+        // } else {
+        //     alert("Notifications could not be loaded as an error occured!");
+        //     }
+        //   });
+        // }
+        // notification();
+
+// Basic notifications - onload
+var notifArray = [];
+const docSnapshot = await getDoc(doc(db,"notifications", userId).withConverter(notificationConverter));
+  if (docSnapshot.exists()){
+    var notification = new Notification(docSnapshot.data().notification);
+    notifArray = [...notification.notification].reverse();
+    if(notifArray.length!=0) {
+      document.getElementById("notification").innerHTML=notifArray.join('<br><br>');
+    } else {
+      document.getElementById("notification").innerHTML="No new notifications!";
+    }
+} else {  
+    await setDoc(docSnapshot, {notification: []});
+    alert("Notifications could not be loaded as an error occured! Please refresh the page!");
+    }
+
+</script>
+
+<script type="module" async>
+  // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.1/firebase-app.js";
+  // import { getDatabase, ref, get, set, child, update, remove, onValue } from "https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js";
+  // import { getFirestore, collection, addDoc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+  // const app1 = initializeApp(callFirebase());
+  // const db0 = getFirestore();
+  // const db1 = getDatabase();
+  // const distanceRef = ref(db1, );
+  // onValue(distanceRef, (snapshot) => {
+  // const level = snapshot.val().smokesensor;
+  // const temp = snapshot.val().temp;
+  // const humid = snapshot.val().humidity;
+  // updateValue(level,temp,humid);
+  // });
+  
+  // var arr=[]
+  // var arr1=[]
+  // var arr2=[]
+  // async function updateValue(level , temp , humid) {
+  //   var status1, status2, status3;
+
+
+  //   if (temp > 35) {
+  //     document.getElementById('temperature').style.color = "red";
+  //     status2 = "Danger";
+  //     var notifSnap1 = await getDoc(doc(db0, "notifications", "kunaal").withConverter(notificationConverter))
+  //         if (notifSnap1.exists()){
+  //           arr1 = [...notifSnap1.data().notification]
+  //         } else {arr1=[]}
+  //         arr1.push("<span style='color:red;'>Temperature is too high. Please check the air conditioning system!</span>");
+  //         await setDoc(doc(db0,"notifications", "kunaal"), {
+  //           notification: arr1
+  //         });    //reload
+  //   } else {
+  //     document.getElementById('temperature').style.color = "green";
+  //     status2 = "Optimum";
+  //   }
+  //   document.getElementById('temperature').innerHTML = "Temperature: "+temp+" °C<br>"+status2;
+
+
+  //   if (humid > 70) {
+  //     document.getElementById('humidity').style.color = "red";
+  //     status3 = "Danger";
+  //     var notifSnap2 = await getDoc(doc(db0, "notifications", "kunaal").withConverter(notificationConverter))
+  //         if (notifSnap2.exists()){
+  //           arr2 = [...notifSnap2.data().notification]
+  //         } else {arr2=[]}
+  //         arr.push("<span style='color:red;'>Temperature is too high. Please check the air conditioning system!</span>");
+  //         await setDoc(doc(db0,"notifications", "kunaal"), {
+  //           notification: arr2
+  //         });
+  //     } else {
+  //     document.getElementById('humidity').style.color = "green";
+  //     status3 = "Optimum";
+  //    }
+  //    document.getElementById('humidity').innerHTML = "Humidity: "+humid+" %<br>"+status3;
+
+
+  //   if (level > 600) {
+  //     document.getElementById('gas-level').style.color = "red";
+  //     status1 = "Danger";
+  //     var notifSnap = await getDoc(doc(db0, "notifications", "kunaal").withConverter(notificationConverter))
+  //         if (notifSnap.exists()){
+  //           arr = [...notifSnap.data().notification]
+  //         } else {arr=[]}
+  //         arr.push("<span style='color:red;'>Gas Level is too high. There may be fire in the perimeter!</span>");
+  //         await setDoc(doc(db0,"notifications", "kunaal"), {
+  //           notification: arr
+  //         });
+  //   } else {
+  //     document.getElementById('gas-level').style.color = "green";
+  //     status1 = "Optimum";
+  //   }
+  //   document.getElementById('gas-level').innerHTML = "Pollution Level: "+level+" ppm<br>"+status1;
+  // }
+  // 
+</script>
+
+</body>
+</html>

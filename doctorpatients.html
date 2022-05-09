@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedRush</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body style="font-family: 'Raleway', sans-serif;">
+    <div style="background-color: rgb(127, 195, 255); padding-top: 20px; padding-left: 50px; padding-bottom: 20px;">
+        <b><label style="font-size: 30px;">Manage Patients</label></b>
+    </div>
+    <div class="container mt-3">
+        <table class="table" id="myTable">
+        <thead>
+            <th>Sl No</th>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Room Number</th>
+            <th>Emergency Contact</th>
+            <th>Emergency Number</th>
+            <th>Add Prescription/Diagnosis/Comments</th>
+        </thead>
+        <tbody id="tbody1"></tbody>
+        </table>
+    </div>
+<script src="assets/js/index.js" async></script>
+<script type="module" async>
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    const firebaseConfig = callFirebase()
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore();
+  import { collection, addDoc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+  const userId=localStorage.getItem("userId");
+  const userType=localStorage.getItem("userType");
+    var slno = 0;
+    var tbody = document.getElementById('tbody1');
+    var patient = [];
+    function addItemToTable(uid,name,room_no,emergency_contact, emergency_number) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        td1.classList.add('data');
+        var td2 = document.createElement('td');
+        td2.classList.add('data');
+        var td3 = document.createElement('td');
+        td3.classList.add('data');
+        var td4 = document.createElement('td');
+        td4.classList.add('data');
+        var td5 = document.createElement('td');
+        td5.classList.add('data');
+        var td6 = document.createElement('td');
+        td6.classList.add('data');
+        var td7 = document.createElement('td');
+        td7.classList.add('data');
+        td1.innerHTML = ++slno;
+        td2.innerHTML = uid;
+        td3.innerHTML = name;
+        td4.innerHTML = room_no;
+        td5.innerHTML = emergency_contact;
+        td6.innerHTML = emergency_number;
+        td7.innerHTML = '<a href="patientprofile.html?uid='+uid+'" style="text-decoration:none;">View full profile here</a>';
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+        tr.appendChild(td6);
+        tr.appendChild(td7);
+        tbody.appendChild(tr);
+    }
+
+    function addAllItemsToTable(ThePatient){
+        slno=0;
+        tbody.innerHTML="";
+        ThePatient.forEach(element => {
+                addItemToTable(element.userid,element.name,element.roomNumber, element.emergencyContactName,element.emergencyContactNumber);
+        });
+    }
+
+    async function getAllDataOnce(){
+        const querySnapshot = await getDocs(collection(db,"Patients"));
+        querySnapshot.forEach(doc => {
+            if (doc.data().assignedDoctorId==userId){
+                patient.push(doc.data());
+            }
+        });
+      addAllItemsToTable(patient);
+    }
+window.onload = getAllDataOnce();
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</body>
+</html>

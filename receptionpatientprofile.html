@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedRush</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    <style>th, td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 15px;
+        padding-right: 20px;
+      }</style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body style="font-family: 'Raleway', sans-serif;">
+    <div class="container" style="padding-top: 30px;">
+    <h4><b><span id="header" style="padding-left: 60px;"></span></b></h4>
+    <div style="padding-left: 40px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <hr>
+            </div>
+        </div>
+    </div>
+    <table>
+        <tr>
+            <td><b>ID Number:</b></td>
+            <td id="userId"></td>
+        </tr>
+        <tr>
+            <td><b>Name:</b></td>
+            <td id="name"></td>
+        </tr>
+        <tr>
+            <td><b>Date of birth:</b></td>
+            <td id="dob"></td>
+        </tr>
+        <tr>
+            <td><b>Gender:</b></td>
+            <td id="gender"></td>
+        </tr>
+        <tr>
+            <td><b>Blood Group:</b></td>
+            <td id="bloodgroup"></td>
+        </tr>
+        <tr>
+            <td><b>Email:</b></td>
+            <td id="email"></td>
+        </tr>
+        <tr>
+            <td><b>Contact Number:</b></td>
+            <td id="contact"></td>
+        </tr>
+        <tr>
+            <td><b>Emergency Contact:</b></td>
+            <td id="emergencyContactName"></td>
+        </tr>
+        <tr>
+            <td><b>Emergency Number:</b></td>
+            <td id="emergencyContactNumber"></td>
+        </tr>
+        <tr>
+            <td id="addadmit" class="editables"><b>Admission Date:</b></td>
+            <td id="admissionDate"></td>
+        </tr>
+        <tr>
+            <td id="adddoctor" class="editables"><b>Doctor:</b></td>
+            <td id="assignedDoctorId"></td>
+        </tr>
+        <tr>
+            <td id="addnurse" class="editables"><b>Nurse:</b></td>
+            <td id="assignedNurseId"></td>
+        </tr>
+        <tr>
+            <td id="addhousekeeping" class="editables"><b>Housekeeping:</b></td>
+            <td id="assignedHousekeepingId"></td>
+        </tr>
+        <tr>
+            <td id="addroomnumber" class="editables"><b>Room Number:</b></td>
+            <td id="roomNumber"></td>
+        </tr>
+        <tr>
+            <td id="addbill" class="editables"><b>Total Bill:</b></td>
+            <td id="bill"></td>
+        </tr>
+        <tr>
+            <td id="adddischarge" class="editables"><b>Discharge Date:</b></td>
+            <td id="dischargeDate"></td>
+        </tr>
+        <tr>
+            <td><b>Latest Diagnosis:</b></td>
+            <td id="diagnosis"></td>
+        </tr>
+        <tr>
+            <td><b>Prescription:</b></td>
+            <td id="prescription"></td>
+        </tr>
+        <tr>
+            <td><b>Doctor Comments:</b></td>
+            <td id="doctorComments"></td>
+        </tr>
+        <tr>
+            <td><b>Visitors:</b></td>
+            <td id="visitors"></td>
+        </tr>
+    </table>
+    </div>
+    </div>
+    <script>
+       var parameter = new URLSearchParams(window.location.search);
+       var uid = parameter.get("uid");
+       if (uid==null){
+           window.alert("Invalid user! Please try again.");
+              window.location.href = "index.html";
+       }
+    </script>
+    <script src="assets/js/index.js" async></script>
+    <script type="module" async>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        const firebaseConfig = callFirebase()
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore();
+        var user;
+        import { collection, addDoc, setDoc, getDoc, updateDoc, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        try{
+            var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+            if(data.exists()){
+                user = data.data();
+            } else {
+                window.alert("User not found! Contact administrator");
+                window.location.href="index.html";
+            }
+           }catch(e){
+            window.alert("Error Occured! Please wait for a while or Contact administrator!");
+            console.log(e);
+            }
+        document.getElementById("header").innerHTML =  user.name.split(' ')[0]+"'s Profile";
+        document.getElementById("userId").innerHTML =user.userid;
+        document.getElementById("name").innerHTML = user.name;
+        document.getElementById("dob").innerHTML = user.dob.split('-')[2]+"/"+user.dob.split('-')[1]+"/"+user.dob.split('-')[0];
+        document.getElementById("gender").innerHTML = user.gender;
+        document.getElementById("bloodgroup").innerHTML =user.bloodgroup;
+        document.getElementById("email").innerHTML = user.email;
+        document.getElementById("admissionDate").innerHTML = user.admissionDate;
+        document.getElementById("contact").innerHTML = user.contact;
+        document.getElementById("assignedDoctorId").innerHTML = '<a href="userprofile.html?uid='+user.assignedDoctorId+'" style="text-decoration:none;">'+user.assignedDoctorId+'</a>';      
+        document.getElementById("assignedNurseId").innerHTML ='<a href="userprofile.html?uid='+user.assignedNurseId+'" style="text-decoration:none;">'+user.assignedNurseId+'</a>';
+        document.getElementById("assignedHousekeepingId").innerHTML ='<a href="userprofile.html?uid='+user.assignedHousekeepingId+'" style="text-decoration:none;">'+user.assignedHousekeepingId+'</a>';
+        const diagnosisArray = [...user.diagnosis];
+        document.getElementById("diagnosis").innerHTML = diagnosisArray.join('<br>');
+        const prescriptionArray = [...user.prescription];
+        document.getElementById("prescription").innerHTML = prescriptionArray.join('<br>');
+        document.getElementById("bill").innerHTML = user.bill;
+        document.getElementById("dischargeDate").innerHTML = user.dischargeDate;
+        document.getElementById("roomNumber").innerHTML = user.roomNumber;
+        document.getElementById("emergencyContactName").innerHTML = user.emergencyContactName;
+        document.getElementById("emergencyContactNumber").innerHTML = user.emergencyContactNumber;
+        document.getElementById("doctorComments").innerHTML = user.doctorComments;
+        const visitorArray = [...user.visitors];
+        document.getElementById("visitors").innerHTML = visitorArray.join('<br>');
+    
+        document.getElementById("adddoctor").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        try{
+        var assignDoctor = prompt("Assign Doctor by id");
+        var arr01 = [];
+        var doctorDetails = await getDoc(doc(db, "Users", assignDoctor).withConverter(firestoreConverter));
+        var notifDetails = await getDoc(doc(db,"notifications", assignDoctor).withConverter(notificationConverter));
+        if (!notifDetails.exists()){
+            await setDoc(doc(db,"notifications", assignDoctor), {
+                notification: arr01,
+            });
+            notifDetails = await getDoc(doc(db,"notifications", assignDoctor).withConverter(notificationConverter));
+        }
+        if (doctorDetails.exists() && doctorDetails.data().type=="Doctor"){
+        var array = [...notifDetails.data().notification];
+            array.push("[ "+Date().toString()+" ]: A new patient has been assigned to you with id: "+user.userid+"!");
+            var newData = {
+                notification: array
+            }
+            await setDoc(doc(db,"notifications", assignDoctor).withConverter(notificationConverter), newData);
+        if(assignDoctor!=null){
+            var newDocCom = {
+                assignedDoctorId: assignDoctor
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            window.location.reload();
+          }
+        } else {
+            alert("Doctor with that id doesn't exist!");
+        }
+      } catch(e){
+          console.log(e);
+          alert("Error making changes! Try again later.");
+      }
+    });
+    
+    document.getElementById("addnurse").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        try{
+        var assignNurse = prompt("Assign Nurse by id");
+        var arr01 = [];
+        var NurseDetails = await getDoc(doc(db, "Users", assignNurse).withConverter(firestoreConverter));
+        var notifDetails = await getDoc(doc(db,"notifications", assignNurse).withConverter(notificationConverter));
+        if (!notifDetails.exists()){
+            await setDoc(doc(db,"notifications", assignNurse), {
+                notification: arr01,
+            });
+            notifDetails = await getDoc(doc(db,"notifications", assignNurse).withConverter(notificationConverter));
+        }
+        if (NurseDetails.exists() && NurseDetails.data().type=="Nurse"){
+        var array = [...notifDetails.data().notification];
+            array.push("[ "+Date().toString()+" ]: A new patient has been assigned to you with id: "+user.userid+"!");
+            var newData = {
+                notification: array
+            }
+            await setDoc(doc(db,"notifications", assignNurse).withConverter(notificationConverter), newData);
+        if(assignNurse!=null){
+            var newDocCom = {
+                assignedNurseId: assignNurse
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            window.location.reload();
+          }
+        } else {
+            alert("Nurse with that id doesn't exist!");
+        }
+      } catch(e){
+          console.log(e);
+          alert("Error making changes! Try again later.");
+      }
+    });
+
+    document.getElementById("addhousekeeping").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        try{
+        var assignHousekeeping = prompt("Assign Housekeeping by id");
+        var arr01 = [];
+        var HousekeepingDetails = await getDoc(doc(db, "Users", assignHousekeeping).withConverter(firestoreConverter));
+        var notifDetails = await getDoc(doc(db,"notifications", assignHousekeeping).withConverter(notificationConverter));
+        if (!notifDetails.exists()){
+            await setDoc(doc(db,"notifications", assignHousekeeping), {
+                notification: arr01,
+            });
+            notifDetails = await getDoc(doc(db,"notifications", assignHousekeeping).withConverter(notificationConverter));
+        }
+        if (HousekeepingDetails.exists() && HousekeepingDetails.data().type=="Housekeeping"){
+        var array = [...notifDetails.data().notification];
+            array.push("[ "+Date().toString()+" ]: A new patient has been assigned to you with id: "+user.userid+"!");
+            var newData = {
+                notification: array
+            }
+            await setDoc(doc(db,"notifications", assignHousekeeping).withConverter(notificationConverter), newData);
+        if(assignHousekeeping!=null){
+            var newNotific = {
+                assignedHousekeepingId: assignHousekeeping
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newNotific);
+            window.location.reload();
+          }
+        } else {
+            alert("Housekeeping with that id doesn't exist!");
+        }
+      } catch(e){
+          console.log(e);
+          alert("Error making changes! Try again later.");
+      }
+    });
+
+    document.getElementById("addroomnumber").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var assignroomnumber = prompt("Assign Room Number");
+        if(assignroomnumber!=null){
+            var newDocCom = {
+                roomNumber: assignroomnumber
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            await updateDoc(doc(db,"rooms", assignroomnumber).withConverter(roomConverter), {
+                roomStatus: "Occupied"
+            });
+            window.location.reload();
+        }
+    });
+
+    document.getElementById("addbill").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var billamt = prompt("Edit Bill");
+        if(billamt!=null){
+            var newDocCom = {
+                bill: billamt
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            window.location.reload();
+        }
+    });
+    document.getElementById("adddischarge").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var discharge = Date().toString();
+        if(window.confirm("Discharge now?")){
+        if(discharge!=null){
+            var newDocCom = {
+                dischargeDate: discharge
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            window.location.reload();
+            }
+        }
+    });
+    document.getElementById("addadmit").addEventListener("click", async function(){
+        var data = await getDoc(doc(db,"Patients", uid).withConverter(patientConverter));
+        if(data.exists()){
+            user = data.data();
+        } else {
+            window.alert("User not found! Contact administrator");
+            window.location.href="index.html";
+        }
+        var admission = Date().toString();
+        if(window.confirm("Admit now?")){
+        if(admission!=null){
+            var newDocCom = {
+                admissionDate: admission,
+                dischargeDate: "",
+                roomNumber: "",
+                diagnosis: "",
+                doctorComments: "",
+                prescription: "",
+                bill: "",
+                assignedDoctorId: "",
+                assignedNurseId: "",
+                assignedHousekeepingId: ""
+            }
+            await updateDoc(doc(db,"Patients", uid).withConverter(patientConverter), newDocCom);
+            window.location.reload();
+        }
+      }
+    });
+    </script>
+</body>
+</html>
